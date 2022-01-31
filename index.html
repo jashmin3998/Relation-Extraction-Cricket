@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CricPedia</title>
+        
+        
+        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<script src="https://cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.4/css/jquery.dataTables.min.css">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css">
+		<style>
+			
+			
+			
+			button {
+					  background-color: #4CAF50; /* Green */
+					  border: none;
+					  color: white;
+					  padding: 15px 32px;
+					  text-align: center;
+					  text-decoration: none;
+					  display: inline-block;
+					  font-size: 16px;
+					  margin: 4px 2px;
+					  cursor: pointer;
+					  background-color: white; 
+					  color: black; 
+					  border: 2px solid #4CAF50;
+					}
+		</style>
+		
+
+        <script>
+		$(document).ready(function() {
+			$('#table_id').DataTable();
+		});
+		function addRows( col1, col2,  col3){
+			var t = $('#table_id').DataTable();
+			t.row.add( [
+				col1,
+				col2,
+				col3
+				] ).draw( false );
+ 
+		}
+        function clearTable(){
+			var table = $('#table_id').DataTable();
+
+			//clear datatable
+			table.clear().draw();
+
+			
+		}
+		function queryData(que,col2){
+				clearTable()
+                $.ajax({
+					
+                    url: "http://ec2-18-191-155-236.us-east-2.compute.amazonaws.com:3030/cricket/?query="+que,
+                    success: function(response){
+                        const map = response.head.vars;
+                        var values = response.results.bindings;
+                        for(var i=0; i<values.length; i++){
+                           
+                               
+                                    var col1 = values[i][map[0]].value;
+									var col3 = values[i][map[1]].value;
+                                   
+									addRows(col1,col2,col3)
+                                
+                              
+                        }    		
+                        
+                    }
+                    
+            });
+        }
+		
+        function queryPlayer(){
+			
+            var query = "PREFIX cricket:<http://www.crickettweet.org/ontologies/cricket%23> SELECT ?text ?player WHERE {   ?tweet cricket:hasText ?text.   ?tweet cricket:hasPlayer ?player } LIMIT 25";
+            queryData(query,"HasPlayer");
+        }
+        
+		function queryTournament(){
+			
+            var query = "PREFIX cricket:<http://www.crickettweet.org/ontologies/cricket%23> SELECT ?text ?tournament WHERE {   ?tweet cricket:hasText ?text.   ?tweet cricket:hasTournament ?tournament } LIMIT 25";
+            queryData(query,"HasTournament");
+        } 
+        
+		function queryCountryTeam(){
+			
+            var query = "PREFIX cricket:<http://www.crickettweet.org/ontologies/cricket%23> SELECT ?text ?countryteam WHERE {   ?tweet cricket:hasText ?text.   ?tweet cricket:hasCountryTeam ?countryteam } LIMIT 25";
+            queryData(query,"HasCountryTeam");
+        } 
+		function queryDate(){
+			
+            var query = "PREFIX cricket:<http://www.crickettweet.org/ontologies/cricket%23> SELECT ?text ?date WHERE {   ?tweet cricket:hasText ?text.   ?tweet cricket:hasDate ?date } LIMIT 25";
+            queryData(query,"HasDate");
+        } 
+		function queryEvent(){
+			
+            var query = "PREFIX cricket:<http://www.crickettweet.org/ontologies/cricket%23> SELECT ?text ?event WHERE {   ?tweet cricket:hasText ?text.   ?tweet cricket:hasEvent ?event } LIMIT 25";
+            queryData(query,"HasEvent");
+        } 
+		function queryRuns(){
+			
+            var query = "PREFIX cricket:<http://www.crickettweet.org/ontologies/cricket%23> SELECT ?text ?runs WHERE {   ?tweet cricket:hasText ?text.   ?tweet cricket:hasRuns ?runs } LIMIT 25";
+            queryData(query,"HasRuns");
+        } 
+		
+        
+        
+        </script>
+    </head>
+
+    <body>
+    
+   	<div>
+   		<button id="player" onclick="queryPlayer()">Player</button>
+		<button id="player" onclick="queryTournament()">Tournament</button>
+		<button id="player" onclick="queryCountryTeam()">Country Team</button>
+		<button id="player" onclick="queryDate()">Date</button>
+		<button id="player" onclick="queryEvent()">Event</button>
+		<button id="player" onclick="queryRuns()">Runs</button>
+   	</div>
+        <br>
+		<br>
+        <table id="table_id" class="table table-striped" style="width:100%">
+		    <thead>
+		        <tr>
+		            <th>Subject</th>
+		            <th>Predicate</th>
+		            <th>Object</th>
+		        </tr>
+		    </thead>
+		    <tbody>
+		        
+		          
+		      </tbody>
+		</table>
+            
+    </body>
+</html>
